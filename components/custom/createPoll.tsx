@@ -71,7 +71,6 @@ export default function CreatePoll() {
             question,
             answers,
             voters,
-            expiresAt: Date.now(),
         };
 
         try {
@@ -86,7 +85,7 @@ export default function CreatePoll() {
 
     return (
         <div className="p-4">
-            <h2 className="text-xl font-bold">Create you poll</h2>
+            <h2 className="text-xl font-bold">Create your poll</h2>
 
             <div className="mt-4 grid grid-cols-2 gap-4">
                 <Input
@@ -98,7 +97,7 @@ export default function CreatePoll() {
                 <Input
                     value={question}
                     onChange={handleQuestionChange}
-                    placeholder="Type a value and press Enter"
+                    placeholder="Question"
                 />
 
                 <div>
@@ -123,7 +122,7 @@ export default function CreatePoll() {
                         value={answer}
                         onChange={handleAnswerChange}
                         onKeyDown={handleAddAnswer}
-                        placeholder="Type a value and press Enter"
+                        placeholder="Answers"
                         className="mt-2"
                     />
                     <button onClick={handleAddAnswer}>+</button>
@@ -151,7 +150,7 @@ export default function CreatePoll() {
                         value={voter}
                         onChange={handleVoterChange}
                         onKeyDown={handleAddVoter}
-                        placeholder="Type a voter email and press Enter"
+                        placeholder="Voters"
                         className="mt-2"
                     />
                     <button onClick={handleAddVoter}>+</button>

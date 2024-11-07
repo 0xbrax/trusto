@@ -1,27 +1,28 @@
 import axios from 'axios';
 import {notFound} from 'next/navigation';
+import VotePoll from "@/components/custom/votePoll";
+
+
+const base_url = process.env.BASE_URL;
 
 export default async function Poll({params}: any) {
     const {id} = await params;
 
-    let pollData;
-
     const getPoll = async () => {
         try {
-            const {data} = await axios.get(`/api/get-poll?pollId=${id}`);
-            pollData = data;
+            const {data} = await axios.get(`${base_url}/api/get-poll?pollId=${id}`);
+            return data;
         } catch (error) {
             console.error(error);
             notFound();
         }
     };
 
-    await getPoll();
+    const pollData = await getPoll();
 
     return (
-        <div>
-            POLL ID {id}
-            {JSON.stringify(pollData)}
+        <div className="h-full p-4 flex justify-center items-center">
+            <VotePoll data={pollData}/>
         </div>
     )
 }

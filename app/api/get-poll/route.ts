@@ -12,8 +12,6 @@ const client = new MongoClient(uri, {
 });
 
 export async function GET(request) {
-    console.log(request)
-
     const url = new URL(request.url);
     const pollId = url.searchParams.get("pollId");
 
@@ -27,7 +25,7 @@ export async function GET(request) {
         const db = client.db("trusto");
         const pollsCollection = db.collection("polls");
 
-        const poll = await pollsCollection.findOne({pollId});
+        const poll = await pollsCollection.findOne({pollId}, {projection: {_id: 0}});
 
         return new Response(JSON.stringify(poll), {status: 200});
     } catch (error) {
