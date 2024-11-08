@@ -4,11 +4,16 @@ import React, {useState} from "react";
 import {Input} from "@/components/ui/input";
 import axios from "axios";
 import {
+    LucidePlus,
     LucideTrash
 } from "lucide-react";
+import {getSolBalance, openBlockchainExplorerTx} from "@/lib/solanaUtils";
 
 
 export default function CreatePoll() {
+    const walletAddress = process.env.NEXT_PUBLIC_SOLANA_WALLET_PUBLIC_KEY;
+    const [walletBalance, setWalletBalance] = useState<number>(0);
+
     const [email, setEmail] = useState<string>('');
     const [question, setQuestion] = useState<string>('');
     const [answer, setAnswer] = useState<string>('');
@@ -76,16 +81,33 @@ export default function CreatePoll() {
         try {
             const {data} = await axios.post('/api/create-poll', pollData);
 
-            console.log('LOG - - ', data.pollId)
+
+            console.log('LOG - - -', data)
+            openBlockchainExplorerTx(data.signature);
         } catch (error) {
             console.error('ERROR: ', error);
         }
     };
 
+    const updateBalance = async () => {
+        const balance = await getSolBalance(walletAddress);
+
+        setWalletBalance(balance);
+    };
+
+
+    // INIT
+    updateBalance();
+
 
     return (
         <div className="p-4">
-            <h2 className="text-xl font-bold">Create your poll</h2>
+            <div>
+                <h2 className="text-xl font-bold">Create your poll</h2>
+
+                <span>{walletAddress}</span>
+                <span>{walletBalance} SOL</span>
+            </div>
 
             <div className="mt-4 grid grid-cols-2 gap-4">
                 <Input
@@ -125,7 +147,7 @@ export default function CreatePoll() {
                         placeholder="Answers"
                         className="mt-2"
                     />
-                    <button onClick={handleAddAnswer}>+</button>
+                    <button onClick={handleAddAnswer}><LucidePlus className="h-4 w-4"/></button>
                 </div>
 
                 <div>
@@ -153,7 +175,7 @@ export default function CreatePoll() {
                         placeholder="Voters"
                         className="mt-2"
                     />
-                    <button onClick={handleAddVoter}>+</button>
+                    <button onClick={handleAddVoter}><LucidePlus className="h-4 w-4"/></button>
                 </div>
             </div>
 

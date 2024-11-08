@@ -1,26 +1,18 @@
 // @ts-nocheck
-import {MongoClient, ServerApiVersion} from 'mongodb';
-import crypto from 'crypto';
+import {getMongoConnection} from "@/lib/mongoUtils";
+import {ObjectId} from 'mongodb';
 
-const uri = process.env.MONGO_URI;
+import {calculateHash, recordHashOnSolana} from "@/lib/solanaUtils";
+import {
+    Keypair,
+} from "@solana/web3.js";
 
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
-
-const generateUniqueId = () => {
-    return crypto.randomBytes(8).toString('hex');
-};
 
 export async function POST(request) {
     const pollData = await request.json();
 
     try {
-        await client.connect();
+        const client = await getMongoConnection();
 
         const db = client.db("trusto");
         const pollsCollection = db.collection("polls");
@@ -29,29 +21,33 @@ export async function POST(request) {
             {expireAfterSeconds: 0}
         );*/
 
-        let uniqueId;
-        let isIdUnique = false;
-        while (!isIdUnique) {
-            uniqueId = generateUniqueId();
-            const existingPoll = await pollsCollection.findOne({pollId: uniqueId});
-            if (!existingPoll) {
-                isIdUnique = true;
-            }
-        }
-
         let expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 7);
         expiresAt = expiresAt.toISOString();
 
         const data = {
             ...pollData,
-            pollId: uniqueId,
-            expiresAt
+            expiresAt: expiresAt
+        };
+        const result = await pollsCollection.insertOne(data);
+        const pollId = result.insertedId;
+
+        const hashData = {
+            ...data,
+            pollId: pollId,
+            timestamp: Date.now()
         };
 
-        await pollsCollection.insertOne(data);
+        const walletPrivateKey = process.env.SOLANA_WALLET_PRIVATE_KEY.split(',').map(Number);
+        const keypair = Keypair.fromSecretKey(new Uint8Array(walletPrivateKey));
+        const hash = calculateHash(hashData);
 
-        return new Response(JSON.stringify({pollId: uniqueId}), {status: 200});
+        const signature = await recordHashOnSolana(keypair, hash);
+
+        const updateData = {$set: {hash: hash, signature: signature}};
+        await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);
+
+        return new Response(JSON.stringify({pollId: pollId, signature: signature}), {status: 200});
     } catch (error) {
         return new Response(JSON.stringify({message: `Oh, no... ${error}`}), {status: 500});
     }

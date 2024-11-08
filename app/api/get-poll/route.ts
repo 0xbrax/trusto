@@ -1,5 +1,5 @@
 // @ts-nocheck
-import {MongoClient, ServerApiVersion} from 'mongodb';
+import {MongoClient, ServerApiVersion, ObjectId} from 'mongodb';
 
 const uri = process.env.MONGO_URI;
 
@@ -24,8 +24,16 @@ export async function GET(request) {
 
         const db = client.db("trusto");
         const pollsCollection = db.collection("polls");
+        const votesCollection = db.collection("votes");
 
-        const poll = await pollsCollection.findOne({pollId}, {projection: {_id: 0}});
+        const poll = await pollsCollection.findOne({_id: new ObjectId(pollId)});
+        poll.votes = await votesCollection.find({pollId: pollId}, {
+            projection: {
+                pollId: 0,
+                answer: 0,
+                expiresAt: 0
+            }
+        }).toArray();
 
         return new Response(JSON.stringify(poll), {status: 200});
     } catch (error) {
