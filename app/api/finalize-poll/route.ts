@@ -1,17 +1,10 @@
 // @ts-nocheck
-import {MongoClient, ServerApiVersion, ObjectId} from 'mongodb';
+
+import {getMongoConnection} from "@/lib/mongoUtils";
+import {ObjectId} from 'mongodb';
 import {calculatePercentages} from "@/lib/globals";
 import {verifyHashFromSolana} from "@/lib/solanaUtils";
 
-const uri = process.env.MONGO_URI;
-
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
 
 const verifyPoll = async (poll) => {
     let isVerified: boolean = true;
@@ -55,16 +48,16 @@ export async function GET(request) {
     }
 
     try {
-        await client.connect();
+        const client = await getMongoConnection();
 
         const db = client.db("trusto");
         const pollsCollection = db.collection("polls");
         const votesCollection = db.collection("votes");
-        const resultsCollection = db.collection("results");
-        await resultsCollection.createIndex(
+        const finalizedPollsCollection = db.collection("finalizedPolls");
+        /*await finalizedPollsCollection.createIndex(
             {expiresAt: 1},
             {expireAfterSeconds: 0}
-        );
+        );*/
 
         const poll = await pollsCollection.findOne({_id: new ObjectId(pollId)});
         if (!poll) {
@@ -72,6 +65,10 @@ export async function GET(request) {
         }
 
         poll.votes = await votesCollection.find({pollId: pollId}).toArray();
+
+        if (poll.voters.length !== poll.votes.length) {
+            return new Response(JSON.stringify({message: 'Some vote are missing'}), {status: 500});
+        }
 
         const isVerified = verifyPoll(poll);
         const answerPercentages = calculatePercentages(poll.answers, poll.votes.map(el => el.answer));
@@ -83,19 +80,20 @@ export async function GET(request) {
         const timestamp = Date.now();
 
         const data = {
-            pollId: poll.pollId,
+            pollId: pollId,
             isVerified: isVerified,
+            answerPercentages: answerPercentages,
             timestamp: timestamp,
             expiresAt: expiresAt
         };
 
-        const result = await resultsCollection.insertOne(data);
-        const resultId = result.insertedId;
+        const result = await finalizedPollsCollection.insertOne(data);
+        const finalizedPollId = result.insertedId;
 
-        await pollsCollection.deleteOne({_id: ObjectId(voteData.pollId)});
-        await votesCollection.deleteMany({pollId: voteData.pollId});
+        await pollsCollection.deleteOne({_id: new ObjectId(pollId)});
+        await votesCollection.deleteMany({pollId: pollId});
 
-        return new Response(JSON.stringify({resultId: resultId}), {status: 200});
+        return new Response(JSON.stringify({finalizedPollId: finalizedPollId}), {status: 200});
     } catch (error) {
         return new Response(JSON.stringify({message: `Oh, no... ${error}`}), {status: 500});
     }

@@ -1,15 +1,8 @@
 // @ts-nocheck
-import {MongoClient, ServerApiVersion, ObjectId} from 'mongodb';
 
-const uri = process.env.MONGO_URI;
+import {getMongoConnection} from "@/lib/mongoUtils";
+import {ObjectId} from 'mongodb';
 
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
 
 export async function GET(request) {
     const url = new URL(request.url);
@@ -20,7 +13,7 @@ export async function GET(request) {
     }
 
     try {
-        await client.connect();
+        const client = await getMongoConnection();
 
         const db = client.db("trusto");
         const pollsCollection = db.collection("polls");

@@ -14,7 +14,7 @@ import {
 import {Button} from "@/components/ui/button";
 import {openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
 import ShinyButton from "@/components/ui/shiny-button";
-import {formatDate} from "@/lib/globals";
+import {calculatePercentages, formatDate} from "@/lib/globals";
 import {
     LucideExternalLink,
     LucideX,
@@ -105,18 +105,20 @@ export default function VotePoll({data}: PollProps) {
 
         try {
             const {data} = await axios.post('/api/vote-poll', voteData);
-
-            console.log('LOG - - ', data.voteId)
         } catch (error: any) {
             console.error('ERROR: ', error.response.data.message);
         }
     };
 
-    // TOTO solo se hanno votato tutti
     const finalizePoll = async () => {
-        const response = await axios.get(`${base_url}/api/finalize-poll?pollId=${data._id}`);
+        const answerPercentages = calculatePercentages(data.answers, data.votes.map(el => el.answer));
 
-        router.push(`/poll/${data._id}?resultId=${response.data.resultId}`);
+        console.log('LOG EOOO', answerPercentages)
+
+
+        //const response = await axios.get(`${base_url}/api/finalize-poll?pollId=${data._id}`);
+
+        //router.push(`/poll/${data._id}?finalizedId=${response.data.finalizedPollId}`);
     };
 
 
@@ -191,6 +193,11 @@ export default function VotePoll({data}: PollProps) {
                          className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
             >
                 Vote
+            </ShinyButton>
+            <ShinyButton onClick={finalizePoll}
+                         className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
+            >
+                Finalize
             </ShinyButton>
         </div>
     )

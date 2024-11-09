@@ -1,4 +1,5 @@
 // @ts-nocheck
+
 import {getMongoConnection} from "@/lib/mongoUtils";
 import {ObjectId} from 'mongodb';
 
@@ -6,6 +7,7 @@ import {calculateHash, recordHashToSolana} from "@/lib/solanaUtils";
 import {
     Keypair,
 } from "@solana/web3.js";
+
 
 export async function POST(request) {
     const voteData = await request.json();
@@ -24,6 +26,10 @@ export async function POST(request) {
         const poll = await pollsCollection.findOne({_id: new ObjectId(voteData.pollId)});
         if (!poll) {
             return new Response(JSON.stringify({message: 'Poll is expired'}), {status: 500});
+        }
+
+        if (!poll.voters.includes(voteData.email)) {
+            return new Response(JSON.stringify({message: 'Email not allowed'}), {status: 500});
         }
 
         const vote = await votesCollection.findOne({pollId: voteData.pollId, email: voteData.email});
