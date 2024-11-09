@@ -10,6 +10,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {Button} from "@/components/ui/button";
+import {calculateHash, openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
+import {
+    LucideExternalLink
+} from "lucide-react";
 
 
 interface VotePollProps {
@@ -19,12 +24,18 @@ interface VotePollProps {
         question: string;
         answers: string[];
         voters: string[];
+        timestamp: string,
         expiresAt: string;
+        hash: string,
+        signature: string,
     };
 }
 
 
 export default function VotePoll({data}: VotePollProps) {
+    console.log('LOG - - ', data)
+
+
     const [email, setEmail] = useState<string>('');
     const [answer, setAnswer] = useState<string>('');
 
@@ -35,7 +46,22 @@ export default function VotePoll({data}: VotePollProps) {
         setAnswer(value);
     };
 
-    console.log('LOG - - ', data)
+
+    const verifyPoll = async (signature: string) => {
+        const hashData = {
+            email: data.email,
+            question: data.question,
+            answers: data.answers,
+            voters: data.voters,
+            timestamp: data.timestamp,
+            expiresAt: data.expiresAt,
+            pollId: data._id
+        };
+
+        const {isVerified, hash} = await verifyHashFromSolana(data, signature);
+
+        console.log(isVerified, hash)
+    };
 
 
     const votePoll = async () => {
@@ -58,6 +84,27 @@ export default function VotePoll({data}: VotePollProps) {
     return (
         <div className="p-4">
             <h2 className="text-xl font-bold">Vote your poll</h2>
+
+            <div>
+                <div>
+                    Signature {data.signature}
+                    <Button variant="secondary"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={() => openBlockchainExplorerTx(data.signature)}
+                    ><LucideExternalLink/>
+                    </Button>
+                </div>
+
+                <div>
+                    Please verify before vote
+                    <Button variant="secondary"
+                            onClick={() => verifyPoll(data.signature)}
+                    >Verify
+                    </Button>
+                </div>
+            </div>
+
 
             <p>{data.question}</p>
 

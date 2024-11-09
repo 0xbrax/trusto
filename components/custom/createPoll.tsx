@@ -3,16 +3,23 @@
 import React, {useState} from "react";
 import {Input} from "@/components/ui/input";
 import axios from "axios";
+import {getSolBalance, requestSolAirdrop} from "@/lib/solanaUtils";
+import {useRouter} from "next/navigation"
+import ShinyButton from "@/components/ui/shiny-button";
+import {Button} from "@/components/ui/button";
 import {
     LucidePlus,
-    LucideTrash
+    LucideTrash,
+    LucideRefreshCw,
+    LucideHandCoins
 } from "lucide-react";
-import {getSolBalance, openBlockchainExplorerTx} from "@/lib/solanaUtils";
 
 
 export default function CreatePoll() {
     const walletAddress = process.env.NEXT_PUBLIC_SOLANA_WALLET_PUBLIC_KEY;
     const [walletBalance, setWalletBalance] = useState<number>(0);
+
+    const router = useRouter();
 
     const [email, setEmail] = useState<string>('');
     const [question, setQuestion] = useState<string>('');
@@ -81,9 +88,7 @@ export default function CreatePoll() {
         try {
             const {data} = await axios.post('/api/create-poll', pollData);
 
-
-            console.log('LOG - - -', data)
-            openBlockchainExplorerTx(data.signature);
+            router.push(`/poll/${data.pollId}`);
         } catch (error) {
             console.error('ERROR: ', error);
         }
@@ -94,6 +99,10 @@ export default function CreatePoll() {
 
         setWalletBalance(balance);
     };
+    const getAirdrop = async () => {
+        await requestSolAirdrop(walletAddress);
+        await updateBalance();
+    };
 
 
     // INIT
@@ -101,12 +110,17 @@ export default function CreatePoll() {
 
 
     return (
-        <div className="p-4">
+        <div className="h-full p-4 overflow-y-auto">
             <div>
                 <h2 className="text-xl font-bold">Create your poll</h2>
 
                 <span>{walletAddress}</span>
                 <span>{walletBalance} SOL</span>
+
+                <Button onClick={updateBalance} variant="secondary">Update<LucideRefreshCw
+                    className="inline h-4 w-4"/></Button>
+                <Button onClick={getAirdrop} variant="secondary">Airdrop<LucideHandCoins
+                    className="inline h-4 w-4"/></Button>
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-4">
@@ -179,7 +193,11 @@ export default function CreatePoll() {
                 </div>
             </div>
 
-            <span onClick={createPoll}>CREA</span>
+            <ShinyButton onClick={createPoll}
+                         className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
+            >
+                Create
+            </ShinyButton>
         </div>
     )
 }

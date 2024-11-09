@@ -2,7 +2,7 @@
 import {getMongoConnection} from "@/lib/mongoUtils";
 import {ObjectId} from 'mongodb';
 
-import {calculateHash, recordHashOnSolana} from "@/lib/solanaUtils";
+import {calculateHash, recordHashToSolana} from "@/lib/solanaUtils";
 import {
     Keypair,
 } from "@solana/web3.js";
@@ -25,8 +25,11 @@ export async function POST(request) {
         expiresAt.setDate(expiresAt.getDate() + 7);
         expiresAt = expiresAt.toISOString();
 
+        const timestamp = Date.now();
+
         const data = {
             ...pollData,
+            timestamp: timestamp,
             expiresAt: expiresAt
         };
         const result = await pollsCollection.insertOne(data);
@@ -35,14 +38,13 @@ export async function POST(request) {
         const hashData = {
             ...data,
             pollId: pollId,
-            timestamp: Date.now()
         };
 
         const walletPrivateKey = process.env.SOLANA_WALLET_PRIVATE_KEY.split(',').map(Number);
         const keypair = Keypair.fromSecretKey(new Uint8Array(walletPrivateKey));
         const hash = calculateHash(hashData);
 
-        const signature = await recordHashOnSolana(keypair, hash);
+        const signature = await recordHashToSolana(keypair, hash);
 
         const updateData = {$set: {hash: hash, signature: signature}};
         await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);
