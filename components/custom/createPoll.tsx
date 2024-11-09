@@ -89,8 +89,8 @@ export default function CreatePoll() {
             const {data} = await axios.post('/api/create-poll', pollData);
 
             router.push(`/poll/${data.pollId}`);
-        } catch (error) {
-            console.error('ERROR: ', error);
+        } catch (error: any) {
+            console.error('ERROR: ', error.response.data.message);
         }
     };
 

@@ -13,6 +13,7 @@ import {
 import {Button} from "@/components/ui/button";
 import {openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
 import ShinyButton from "@/components/ui/shiny-button";
+import {formatDate} from "@/lib/globals";
 import {
     LucideExternalLink,
     LucideX,
@@ -60,7 +61,7 @@ export default function VotePoll({data}: PollProps) {
     };
 
 
-    const verifyPoll = async (signature: string) => {
+    const verifyPoll = async () => {
         let isVerified: boolean = true;
         const hashData = {
             email: data.email,
@@ -72,8 +73,10 @@ export default function VotePoll({data}: PollProps) {
             pollId: data._id
         };
 
-        isVerified = await verifyHashFromSolana(hashData, signature);
+        isVerified = await verifyHashFromSolana(hashData, data.signature);
         isVerified = await verifyVotes();
+
+        console.log('IS VERIFIED', isVerified)
 
         setIsPollVerified(isVerified);
     };
@@ -104,8 +107,8 @@ export default function VotePoll({data}: PollProps) {
             const {data} = await axios.post('/api/vote-poll', voteData);
 
             console.log('LOG - - ', data.voteId)
-        } catch (error) {
-            console.error('ERROR: ', error);
+        } catch (error: any) {
+            console.error('ERROR: ', error.response.data.message);
         }
     };
 
@@ -115,6 +118,10 @@ export default function VotePoll({data}: PollProps) {
             <h2 className="text-xl font-bold">Vote your poll</h2>
 
             <div>
+                <div>
+                    Expires at
+                    {formatDate(data.expiresAt)}
+                </div>
                 <div>
                     Signature {data.signature}
                     <Button variant="secondary"
@@ -139,7 +146,7 @@ export default function VotePoll({data}: PollProps) {
                         </span>
                     )}
                     <Button variant="secondary"
-                            onClick={() => verifyPoll(data.signature)}
+                            onClick={verifyPoll}
                     >Verify
                     </Button>
                 </div>

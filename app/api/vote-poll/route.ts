@@ -14,15 +14,24 @@ export async function POST(request) {
         const client = await getMongoConnection();
 
         const db = client.db("trusto");
+        const pollsCollection = db.collection("polls");
         const votesCollection = db.collection("votes");
         /*await votesCollection.createIndex(
             {expiresAt: 1},
             {expireAfterSeconds: 0}
         );*/
 
+        const poll = await pollsCollection.findOne({_id: new ObjectId(voteData.pollId)});
+        console.log(poll)
+        if (!poll) {
+            return new Response(JSON.stringify({message: 'Poll is expired'}), {status: 500});
+        }
+
         const vote = await votesCollection.findOne({pollId: voteData.pollId, email: voteData.email});
+
+        console.log(vote)
         if (vote) {
-            return new Response(JSON.stringify({message: `You already voted this poll ${voteData.email}`}), {status: 500});
+            return new Response(JSON.stringify({message: 'You already voted this poll'}), {status: 500});
         }
 
         let expiresAt = new Date();
