@@ -5,8 +5,10 @@ import VotePoll from "@/components/custom/votePoll";
 
 const base_url = process.env.BASE_URL;
 
-export default async function Poll({params}: any) {
-    const {id} = await params;
+export default async function Poll(context: any) {
+    const {id} = context.params;
+    const {resultId} = context.query;
+    let data = null;
 
     const getPoll = async () => {
         try {
@@ -17,12 +19,27 @@ export default async function Poll({params}: any) {
             notFound();
         }
     };
+    const getResult = async () => {
+        try {
+            const {data} = await axios.get(`${base_url}/api/get-result?resultId=${resultId}`);
+            return data;
+        } catch (error) {
+            console.error(error);
+            notFound();
+        }
+    }
 
-    const pollData = await getPoll();
+    if (resultId) {
+        data = await getPoll();
+    } else {
+        data = await getResult();
+    }
+
 
     return (
-        <div className="h-full p-4 flex justify-center items-center">
-            <VotePoll data={pollData}/>
+        <div className="h-full flex justify-center items-center">
+            {resultId && <VotePoll data={data}/>}
+            {!resultId && <span>ciao mondo</span>}
         </div>
     )
 }

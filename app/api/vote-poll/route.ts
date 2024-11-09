@@ -22,14 +22,11 @@ export async function POST(request) {
         );*/
 
         const poll = await pollsCollection.findOne({_id: new ObjectId(voteData.pollId)});
-        console.log(poll)
         if (!poll) {
             return new Response(JSON.stringify({message: 'Poll is expired'}), {status: 500});
         }
 
         const vote = await votesCollection.findOne({pollId: voteData.pollId, email: voteData.email});
-
-        console.log(vote)
         if (vote) {
             return new Response(JSON.stringify({message: 'You already voted this poll'}), {status: 500});
         }
@@ -43,7 +40,7 @@ export async function POST(request) {
         const data = {
             ...voteData,
             timestamp: timestamp,
-            expiresAt: expiresAt // used only for auto-remove in Mongo
+            expiresAt: expiresAt // used for auto-remove in Mongo only, we are going to delete it
         };
 
         const result = await votesCollection.insertOne(data);

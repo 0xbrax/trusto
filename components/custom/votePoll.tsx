@@ -2,6 +2,7 @@
 
 import React, {useState} from "react";
 import axios from "axios";
+import {useRouter} from "next/navigation";
 import {Input} from "@/components/ui/input";
 import {
     Select,
@@ -19,6 +20,8 @@ import {
     LucideX,
     LucideCheck
 } from "lucide-react";
+
+const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 
 
 interface VoteProps {
@@ -45,9 +48,7 @@ interface PollProps {
 
 
 export default function VotePoll({data}: PollProps) {
-    console.log('LOG - - -', data)
-
-
+    const router = useRouter();
     const [isPollVerified, setIsPollVerified] = useState<boolean>(false);
 
     const [email, setEmail] = useState<string>('');
@@ -95,7 +96,6 @@ export default function VotePoll({data}: PollProps) {
         return isVerified;
     };
 
-
     const votePoll = async () => {
         const voteData = {
             pollId: data._id,
@@ -110,6 +110,13 @@ export default function VotePoll({data}: PollProps) {
         } catch (error: any) {
             console.error('ERROR: ', error.response.data.message);
         }
+    };
+
+    // TOTO solo se hanno votato tutti
+    const finalizePoll = async () => {
+        const response = await axios.get(`${base_url}/api/finalize-poll?pollId=${data._id}`);
+
+        router.push(`/poll/${data._id}?resultId=${response.data.resultId}`);
     };
 
 
