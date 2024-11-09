@@ -26,12 +26,16 @@ export async function GET(request) {
         const pollsCollection = db.collection("polls");
         const votesCollection = db.collection("votes");
 
-        const poll = await pollsCollection.findOne({_id: new ObjectId(pollId)});
+        const poll = await pollsCollection.findOne({_id: new ObjectId(pollId)}, {
+            projection: {
+                hash: 0
+            }
+        });
         poll.votes = await votesCollection.find({pollId: pollId}, {
             projection: {
                 pollId: 0,
-                answer: 0,
-                expiresAt: 0
+                expiresAt: 0,
+                hash: 0
             }
         }).toArray();
 

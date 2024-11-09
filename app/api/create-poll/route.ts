@@ -32,6 +32,7 @@ export async function POST(request) {
             timestamp: timestamp,
             expiresAt: expiresAt
         };
+
         const result = await pollsCollection.insertOne(data);
         const pollId = result.insertedId;
 

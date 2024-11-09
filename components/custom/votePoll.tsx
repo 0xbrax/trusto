@@ -11,13 +11,24 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import {Button} from "@/components/ui/button";
-import {calculateHash, openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
+import {openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
+import ShinyButton from "@/components/ui/shiny-button";
 import {
-    LucideExternalLink
+    LucideExternalLink,
+    LucideX,
+    LucideCheck
 } from "lucide-react";
 
 
-interface VotePollProps {
+interface VoteProps {
+    _id: string,
+    email: string,
+    answer: string,
+    timestamp: string,
+    signature: string,
+}
+
+interface PollProps {
     data: {
         _id: string,
         email: string;
@@ -26,15 +37,17 @@ interface VotePollProps {
         voters: string[];
         timestamp: string,
         expiresAt: string;
-        hash: string,
         signature: string,
+        votes: VoteProps[]
     };
 }
 
 
-export default function VotePoll({data}: VotePollProps) {
-    console.log('LOG - - ', data)
+export default function VotePoll({data}: PollProps) {
+    console.log('LOG - - -', data)
 
+
+    const [isPollVerified, setIsPollVerified] = useState<boolean>(false);
 
     const [email, setEmail] = useState<string>('');
     const [answer, setAnswer] = useState<string>('');
@@ -48,6 +61,7 @@ export default function VotePoll({data}: VotePollProps) {
 
 
     const verifyPoll = async (signature: string) => {
+        let isVerified: boolean = true;
         const hashData = {
             email: data.email,
             question: data.question,
@@ -58,9 +72,24 @@ export default function VotePoll({data}: VotePollProps) {
             pollId: data._id
         };
 
-        const {isVerified, hash} = await verifyHashFromSolana(data, signature);
+        isVerified = await verifyHashFromSolana(hashData, signature);
+        isVerified = await verifyVotes();
 
-        console.log(isVerified, hash)
+        setIsPollVerified(isVerified);
+    };
+    const verifyVotes = async () => {
+        let isVerified: boolean = true;
+        for (const vote of data.votes as VoteProps[]) {
+            const hashData = {
+                pollId: vote._id,
+                email: vote.email,
+                answer: vote.answer,
+                timestamp: vote.timestamp,
+                voteId: vote._id
+            };
+            isVerified = await verifyHashFromSolana(hashData, vote.signature);
+        }
+        return isVerified;
     };
 
 
@@ -98,6 +127,17 @@ export default function VotePoll({data}: VotePollProps) {
 
                 <div>
                     Please verify before vote
+                    {isPollVerified ? (
+                        <span
+                            className="h-8 aspect-square rounded-full bg-primary-color text-black flex justify-center items-center"
+                        ><LucideCheck/>
+                        </span>
+                    ) : (
+                        <span
+                            className="h-8 aspect-square rounded-full bg-secondary-color flex justify-center items-center"
+                        ><LucideX/>
+                        </span>
+                    )}
                     <Button variant="secondary"
                             onClick={() => verifyPoll(data.signature)}
                     >Verify
@@ -132,7 +172,12 @@ export default function VotePoll({data}: VotePollProps) {
                 </Select>
             </div>
 
-            <span onClick={votePoll}>VOTA</span>
+
+            <ShinyButton onClick={votePoll}
+                         className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
+            >
+                Vote
+            </ShinyButton>
         </div>
     )
 }
