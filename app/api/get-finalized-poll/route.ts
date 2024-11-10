@@ -18,7 +18,11 @@ export async function GET(request) {
         const db = client.db("trusto");
         const finalizedPollsCollection = db.collection("finalizedPolls");
 
-        const finalizedPoll = await finalizedPollsCollection.findOne({_id: new ObjectId(finalizedId)});
+        const finalizedPoll = await finalizedPollsCollection.findOne({_id: new ObjectId(finalizedId)}, {
+            projection: {
+                hash: 0
+            }
+        });
 
         return new Response(JSON.stringify(finalizedPoll), {status: 200});
     } catch (error) {

@@ -65,13 +65,12 @@ export default function VotePoll({data}: PollProps) {
     const verifyPoll = async () => {
         let isVerified: boolean = true;
         const hashData = {
+            pollId: data._id,
             email: data.email,
             question: data.question,
             answers: data.answers,
             voters: data.voters,
-            timestamp: data.timestamp,
-            expiresAt: data.expiresAt,
-            pollId: data._id
+            timestamp: data.timestamp
         };
 
         isVerified = await verifyHashFromSolana(hashData, data.signature);
@@ -83,11 +82,11 @@ export default function VotePoll({data}: PollProps) {
         let isVerified: boolean = true;
         for (const vote of data.votes as VoteProps[]) {
             const hashData = {
-                pollId: vote._id,
+                pollId: data._id,
+                voteId: vote._id,
                 email: vote.email,
                 answer: vote.answer,
-                timestamp: vote.timestamp,
-                voteId: vote._id
+                timestamp: vote.timestamp
             };
             isVerified = await verifyHashFromSolana(hashData, vote.signature);
         }
@@ -98,7 +97,7 @@ export default function VotePoll({data}: PollProps) {
         const voteData = {
             pollId: data._id,
             email,
-            answer,
+            answer
         };
 
         try {

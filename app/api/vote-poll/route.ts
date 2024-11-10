@@ -46,19 +46,18 @@ export async function POST(request) {
         const data = {
             ...voteData,
             timestamp: timestamp,
-            expiresAt: expiresAt // used for auto-remove in Mongo only, we are going to delete it
+            expiresAt: expiresAt
         };
 
         const result = await votesCollection.insertOne(data);
         const voteId = result.insertedId.toString();
-        delete data.expiresAt;
 
         const hashData = {
-            pollId: vote._id,
+            pollId: vote.pollId,
+            voteId: voteId,
             email: vote.email,
             answer: vote.answer,
-            timestamp: vote.timestamp,
-            voteId: voteId,
+            timestamp: vote.timestamp
         };
 
         const walletPrivateKey = process.env.SOLANA_WALLET_PRIVATE_KEY.split(',').map(Number);

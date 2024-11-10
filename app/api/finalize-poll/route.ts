@@ -3,19 +3,19 @@
 import {getMongoConnection} from "@/lib/mongoUtils";
 import {ObjectId} from 'mongodb';
 import {calculatePercentages} from "@/lib/globals";
-import {verifyHashFromSolana} from "@/lib/solanaUtils";
+import {calculateHash, recordHashToSolana, verifyHashFromSolana} from "@/lib/solanaUtils";
+import {Keypair} from "@solana/web3.js";
 
 
 const verifyPoll = async (poll) => {
     let isVerified: boolean = true;
     const hashData = {
+        pollId: poll._id.toString(),
         email: poll.email,
         question: poll.question,
         answers: poll.answers,
         voters: poll.voters,
-        timestamp: poll.timestamp,
-        expiresAt: poll.expiresAt,
-        pollId: poll._id
+        timestamp: poll.timestamp
     };
 
     isVerified = await verifyHashFromSolana(hashData, data.signature);
@@ -27,11 +27,11 @@ const verifyVotes = async (votes) => {
     let isVerified: boolean = true;
     for (const vote of votes) {
         const hashData = {
-            pollId: vote._id,
+            pollId: vote.pollId,
+            voteId: vote._id.toString(),
             email: vote.email,
             answer: vote.answer,
             timestamp: vote.timestamp,
-            voteId: vote._id
         };
         isVerified = await verifyHashFromSolana(hashData, vote.signature);
     }
@@ -89,6 +89,23 @@ export async function GET(request) {
 
         const result = await finalizedPollsCollection.insertOne(data);
         const finalizedPollId = result.insertedId.toString();
+
+        const hashData = {
+            pollId: data.pollId,
+            finalizedPollId: finalizedPollId,
+            isVerified: data.isVerified,
+            answerPercentages: data.answerPercentages,
+            timestamp: data.timestamp
+        };
+
+        const walletPrivateKey = process.env.SOLANA_WALLET_PRIVATE_KEY.split(',').map(Number);
+        const keypair = Keypair.fromSecretKey(new Uint8Array(walletPrivateKey));
+        const hash = calculateHash(hashData);
+
+        const signature = await recordHashToSolana(keypair, hash);
+
+        const updateData = {$set: {hash: hash, signature: signature}};
+        await finalizedPollsCollection.updateOne({_id: new ObjectId(voteId)}, updateData);
 
         await pollsCollection.deleteOne({_id: new ObjectId(pollId)});
         await votesCollection.deleteMany({pollId: pollId});

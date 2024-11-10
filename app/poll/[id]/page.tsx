@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {notFound} from 'next/navigation';
 import VotePoll from "@/components/custom/votePoll";
+import FinalizedPoll from "@/components/custom/finalizedPoll";
 
 
 const base_url = process.env.BASE_URL;
@@ -43,7 +44,7 @@ export default async function Poll(context: any) {
     return (
         <div className="h-full flex justify-center items-center">
             {!finalizedId && <VotePoll data={data}/>}
-            {finalizedId && <span>ciao mondo</span>}
+            {finalizedId && <FinalizedPoll data={data}/>}
         </div>
     )
 }
