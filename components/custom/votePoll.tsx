@@ -128,12 +128,12 @@ export default function VotePoll({data}: PollProps) {
                 <span>Verify before vote</span>
                 {isPollVerified ? (
                     <span
-                        className="h-8 aspect-square rounded-full bg-primary-color text-black flex justify-center items-center"
+                        className="h-9 aspect-square rounded-full bg-primary-color text-black flex justify-center items-center"
                     ><LucideCheck/>
                         </span>
                 ) : (
                     <span
-                        className="h-8 aspect-square rounded-full bg-secondary-color flex justify-center items-center"
+                        className="h-9 aspect-square rounded-full bg-secondary-color flex justify-center items-center"
                     ><LucideX/>
                         </span>
                 )}
@@ -155,14 +155,15 @@ export default function VotePoll({data}: PollProps) {
                 <Input
                     value={email}
                     onChange={handleEmailChange}
-                    placeholder="Email"
+                    placeholder="Enter email"
+                    className="placeholder:text-primary-color/75"
                 />
 
                 <Select
                     value={answer}
                     onValueChange={handleAnswerChange}
                 >
-                    <SelectTrigger>
+                    <SelectTrigger className={!answer ? "text-primary-color/75" : ""}>
                         <SelectValue placeholder="Select answer"/>
                     </SelectTrigger>
                     <SelectContent>

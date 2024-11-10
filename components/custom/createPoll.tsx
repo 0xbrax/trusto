@@ -137,13 +137,15 @@ export default function CreatePoll() {
                 <Input
                     value={email}
                     onChange={handleEmailChange}
-                    placeholder="Email"
+                    placeholder="Enter email"
+                    className="placeholder:text-primary-color/75"
                 />
 
                 <Input
                     value={question}
                     onChange={handleQuestionChange}
-                    placeholder="Question"
+                    placeholder="Enter question"
+                    className="placeholder:text-primary-color/75"
                 />
 
                 <div>
@@ -152,8 +154,8 @@ export default function CreatePoll() {
                             value={answer}
                             onChange={handleAnswerChange}
                             onKeyDown={handleAddAnswer}
-                            placeholder="Answers"
-                            className="w-full pr-10"
+                            placeholder="Add answers"
+                            className="placeholder:text-primary-color/75 pr-10"
                         />
                         <button onClick={handleAddAnswer}
                                 className="absolute inset-y-0 right-0 flex items-center pr-2"
@@ -185,8 +187,8 @@ export default function CreatePoll() {
                             value={voter}
                             onChange={handleVoterChange}
                             onKeyDown={handleAddVoter}
-                            placeholder="Voters"
-                            className="w-full pr-10"
+                            placeholder="Add voters"
+                            className="placeholder:text-primary-color/75 pr-10"
                         />
                         <button onClick={handleAddVoter}
                                 className="absolute inset-y-0 right-0 flex items-center pr-2"
