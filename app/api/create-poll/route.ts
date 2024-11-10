@@ -35,11 +35,16 @@ export async function POST(request) {
         };
 
         const result = await pollsCollection.insertOne(data);
-        const pollId = result.insertedId;
+        const pollId = result.insertedId.toString();
 
         const hashData = {
-            ...data,
-            pollId: pollId,
+            email: data.email,
+            question: data.question,
+            answers: data.answers,
+            voters: data.voters,
+            timestamp: data.timestamp,
+            expiresAt: data.expiresAt,
+            pollId: pollId
         };
 
         const walletPrivateKey = process.env.SOLANA_WALLET_PRIVATE_KEY.split(',').map(Number);

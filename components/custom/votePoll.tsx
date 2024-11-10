@@ -14,7 +14,7 @@ import {
 import {Button} from "@/components/ui/button";
 import {openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
 import ShinyButton from "@/components/ui/shiny-button";
-import {calculatePercentages, formatDate} from "@/lib/globals";
+import {formatDate} from "@/lib/globals";
 import {
     LucideExternalLink,
     LucideX,
@@ -77,8 +77,6 @@ export default function VotePoll({data}: PollProps) {
         isVerified = await verifyHashFromSolana(hashData, data.signature);
         isVerified = await verifyVotes();
 
-        console.log('IS VERIFIED', isVerified)
-
         setIsPollVerified(isVerified);
     };
     const verifyVotes = async () => {
@@ -104,21 +102,16 @@ export default function VotePoll({data}: PollProps) {
         };
 
         try {
-            const {data} = await axios.post('/api/vote-poll', voteData);
+            await axios.post('/api/vote-poll', voteData);
         } catch (error: any) {
             console.error('ERROR: ', error.response.data.message);
         }
     };
 
     const finalizePoll = async () => {
-        const answerPercentages = calculatePercentages(data.answers, data.votes.map(el => el.answer));
+        const response = await axios.get(`${base_url}/api/finalize-poll?pollId=${data._id}`);
 
-        console.log('LOG EOOO', answerPercentages)
-
-
-        //const response = await axios.get(`${base_url}/api/finalize-poll?pollId=${data._id}`);
-
-        //router.push(`/poll/${data._id}?finalizedId=${response.data.finalizedPollId}`);
+        router.push(`/poll/${data._id}?finalizedId=${response.data.finalizedPollId}`);
     };
 
 

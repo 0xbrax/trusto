@@ -88,7 +88,7 @@ export async function GET(request) {
         };
 
         const result = await finalizedPollsCollection.insertOne(data);
-        const finalizedPollId = result.insertedId;
+        const finalizedPollId = result.insertedId.toString();
 
         await pollsCollection.deleteOne({_id: new ObjectId(pollId)});
         await votesCollection.deleteMany({pollId: pollId});

@@ -50,11 +50,14 @@ export async function POST(request) {
         };
 
         const result = await votesCollection.insertOne(data);
-        const voteId = result.insertedId;
+        const voteId = result.insertedId.toString();
         delete data.expiresAt;
 
         const hashData = {
-            ...data,
+            pollId: vote._id,
+            email: vote.email,
+            answer: vote.answer,
+            timestamp: vote.timestamp,
             voteId: voteId,
         };
 
