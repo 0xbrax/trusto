@@ -107,15 +107,15 @@ export default function CreatePoll() {
 
 
     // INIT
-    updateBalance();
+    updateBalance(); // async is ignored
 
 
     return (
-        <div className="h-full p-4 overflow-y-auto">
+        <div className="h-full p-4 overflow-y-auto text-center md:text-start">
             <div>
                 <h2 className="text-xl font-bold">Your poll</h2>
 
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-2 flex justify-center md:justify-start items-center gap-2">
                     <span>{walletBalance} SOL</span>
 
                     <Button
@@ -133,7 +133,7 @@ export default function CreatePoll() {
                 </div>
             </div>
 
-            <div className="my-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                     value={email}
                     onChange={handleEmailChange}
@@ -214,7 +214,7 @@ export default function CreatePoll() {
             </div>
 
             <ShinyButton onClick={createPoll}
-                         className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
+                         className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all mt-4"
             >
                 Create
             </ShinyButton>

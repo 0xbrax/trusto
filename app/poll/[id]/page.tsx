@@ -41,9 +41,9 @@ export default async function Poll(context: any) {
 
 
     return (
-        <div id="poll" className="h-full flex justify-center items-center">
+        <div id="poll" className="container mx-auto px-4 h-full flex justify-center items-center">
             <div
-                className="relative overflow-hidden rounded-lg border glass shadow-xl"
+                className="relative w-full md:w-1/2 overflow-hidden rounded-lg border glass shadow-xl"
             >
                 {!finalizedId && <VotePoll data={data}/>}
                 {finalizedId && <FinalizedPoll data={data}/>}

@@ -9,7 +9,7 @@ interface FinalizedPollProps {
         pollId: string,
         isVerified: boolean,
         answerPercentages: object[],
-        timestamp: string,
+        timestamp: number,
         expiresAt: string,
         signature: string,
     };
@@ -17,7 +17,7 @@ interface FinalizedPollProps {
 
 export default function FinalizedPoll({data}: FinalizedPollProps) {
     const [isPollVerified, setIsPollVerified] = useState<boolean>(false);
-    
+
     const verifyPoll = async () => {
         const hashData = {
             pollId: data.pollId,

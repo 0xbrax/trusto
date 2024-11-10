@@ -28,7 +28,7 @@ interface VoteProps {
     _id: string,
     email: string,
     answer: string,
-    timestamp: string,
+    timestamp: number,
     signature: string,
 }
 
@@ -39,7 +39,7 @@ interface PollProps {
         question: string;
         answers: string[];
         voters: string[];
-        timestamp: string,
+        timestamp: number,
         expiresAt: string;
         signature: string,
         votes: VoteProps[]
@@ -115,48 +115,43 @@ export default function VotePoll({data}: PollProps) {
 
 
     return (
-        <div className="p-4">
-            <h2 className="text-xl font-bold">Vote your poll</h2>
-
-            <div>
-                <div>
-                    Expires at
-                    {formatDate(data.expiresAt)}
-                </div>
-                <div>
-                    Signature {data.signature}
-                    <Button variant="secondary"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => openBlockchainExplorerTx(data.signature)}
-                    ><LucideExternalLink/>
-                    </Button>
-                </div>
+        <div className="p-4 text-center md:text-start">
+            <div className="flex flex-col justify-between items-center">
+                <h2 className="text-xl font-bold">Vote poll</h2>
 
                 <div>
-                    Please verify before vote
-                    {isPollVerified ? (
-                        <span
-                            className="h-8 aspect-square rounded-full bg-primary-color text-black flex justify-center items-center"
-                        ><LucideCheck/>
-                        </span>
-                    ) : (
-                        <span
-                            className="h-8 aspect-square rounded-full bg-secondary-color flex justify-center items-center"
-                        ><LucideX/>
-                        </span>
-                    )}
-                    <Button variant="secondary"
-                            onClick={verifyPoll}
-                    >Verify
-                    </Button>
+                    Expires at {formatDate(data.expiresAt)}
                 </div>
             </div>
 
+            <div className="flex justify-center md:justify-start items-center gap-2 mt-2">
+                <span>Verify before vote</span>
+                {isPollVerified ? (
+                    <span
+                        className="h-8 aspect-square rounded-full bg-primary-color text-black flex justify-center items-center"
+                    ><LucideCheck/>
+                        </span>
+                ) : (
+                    <span
+                        className="h-8 aspect-square rounded-full bg-secondary-color flex justify-center items-center"
+                    ><LucideX/>
+                        </span>
+                )}
+                <Button variant="secondary"
+                        size="icon"
+                        className="rounded-full"
+                        onClick={() => openBlockchainExplorerTx(data.signature)}
+                ><LucideExternalLink/>
+                </Button>
+                <Button variant="secondary"
+                        onClick={verifyPoll}
+                >Verify
+                </Button>
+            </div>
 
-            <p>{data.question}</p>
+            <div className="mt-4 font-bold">{data.question}</div>
 
-            <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                     value={email}
                     onChange={handleEmailChange}
@@ -167,7 +162,7 @@ export default function VotePoll({data}: PollProps) {
                     value={answer}
                     onValueChange={handleAnswerChange}
                 >
-                    <SelectTrigger className="w-1/2 overflow-hidden">
+                    <SelectTrigger>
                         <SelectValue placeholder="Select answer"/>
                     </SelectTrigger>
                     <SelectContent>
@@ -181,16 +176,18 @@ export default function VotePoll({data}: PollProps) {
             </div>
 
 
-            <ShinyButton onClick={votePoll}
-                         className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
-            >
-                Vote
-            </ShinyButton>
-            <ShinyButton onClick={finalizePoll}
-                         className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
-            >
-                Finalize
-            </ShinyButton>
+            <div className="mt-4">
+                <ShinyButton onClick={votePoll}
+                             className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all mr-4"
+                >
+                    Vote
+                </ShinyButton>
+                <ShinyButton onClick={finalizePoll}
+                             className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
+                >
+                    Finalize
+                </ShinyButton>
+            </div>
         </div>
     )
 }
