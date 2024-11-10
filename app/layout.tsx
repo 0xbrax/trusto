@@ -4,6 +4,7 @@ import "@/app/globals.css";
 
 import {GlobalProvider} from "@/context/GlobalContext";
 import Particles from "@/components/ui/particles";
+import Menubar from "@/components/custom/menubar";
 
 
 export const metadata: Metadata = {
@@ -20,7 +21,9 @@ export default function RootLayout({
         <html lang="en">
         <body>
         <GlobalProvider>
-            <div id="app" className="h-full bg-black text-white">
+            <div id="app" className="relative h-full bg-black text-white">
+                <Menubar/>
+
                 {children}
 
                 <Particles

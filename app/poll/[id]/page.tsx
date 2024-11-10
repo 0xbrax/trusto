@@ -2,6 +2,7 @@ import axios from 'axios';
 import {notFound} from 'next/navigation';
 import VotePoll from "@/components/custom/votePoll";
 import FinalizedPoll from "@/components/custom/finalizedPoll";
+import {BorderBeam} from "@/components/ui/border-beam";
 
 
 const base_url = process.env.BASE_URL;
@@ -36,15 +37,25 @@ export default async function Poll(context: any) {
     }
     if (finalizedId) {
         data = await getResult();
-
-        console.log('FINALIZED POLL - - -', data)
     }
 
 
     return (
-        <div className="h-full flex justify-center items-center">
-            {!finalizedId && <VotePoll data={data}/>}
-            {finalizedId && <FinalizedPoll data={data}/>}
+        <div id="poll" className="h-full flex justify-center items-center">
+            <div
+                className="relative overflow-hidden rounded-lg border glass shadow-xl"
+            >
+                {!finalizedId && <VotePoll data={data}/>}
+                {finalizedId && <FinalizedPoll data={data}/>}
+
+                <BorderBeam
+                    size={250}
+                    duration={12}
+                    delay={9}
+                    colorFrom="#E34107"
+                    colorTo="#DDDDDD"
+                />
+            </div>
         </div>
     )
 }
