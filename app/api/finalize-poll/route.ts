@@ -82,6 +82,7 @@ export async function GET(request) {
         const data = {
             pollId: pollId,
             isVerified: isVerified,
+            question: poll.question,
             answerPercentages: answerPercentages,
             timestamp: timestamp,
             expiresAt: expiresAt
@@ -94,6 +95,7 @@ export async function GET(request) {
             pollId: data.pollId,
             finalizedPollId: finalizedPollId,
             isVerified: data.isVerified,
+            question: data.question,
             answerPercentages: data.answerPercentages,
             timestamp: data.timestamp
         };
