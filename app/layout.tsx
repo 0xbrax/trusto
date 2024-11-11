@@ -8,7 +8,7 @@ import Menubar from "@/components/custom/menubar";
 
 export const metadata: Metadata = {
     title: "Trusto.foo",
-    description: "Web2/Web3 hybrid voting platform",
+    description: "Hybrid WEB2-WEB3 voting platform based on Solana blockchain.",
 };
 
 export default function RootLayout({

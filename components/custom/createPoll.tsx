@@ -17,7 +17,7 @@ import {
 
 
 export default function CreatePoll() {
-    const walletAddress = process.env.NEXT_PUBLIC_SOLANA_WALLET_PUBLIC_KEY;
+    const walletAddress = process.env.NEXT_PUBLIC_SOLANA_WALLET_ADDRESS;
     const [walletBalance, setWalletBalance] = useState<number>(0);
 
     const router = useRouter();
