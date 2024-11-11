@@ -8,10 +8,10 @@ import CreatePoll from "@/components/custom/createPoll";
 export default function Home() {
     return (
         <div id="home"
-             className="container mx-auto px-4 h-full md:flex justify-center items-center gap-4 md:gap-8 overflow-y-auto">
-            <div className="h-full md:h-auto md:w-1/2 flex flex-col justify-center items-center">
+             className="container mx-auto px-4 h-full flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 overflow-y-auto">
+            <div className="w-full md:w-1/2 flex flex-col justify-center items-center">
                 <h1
-                    className="text-center text-2xl md:text-6xl font-bold text-primary-color"
+                    className="text-center text-3xl md:text-6xl font-bold text-primary-color"
                 >
                     <span className="">Building <span
                         className="inline-block px-3 bg-primary-color text-secondary-color">trust</span>,</span><br/>
@@ -19,12 +19,12 @@ export default function Home() {
                     className="inline-block px-3 bg-primary-color text-secondary-color">!</span>
                 </h1>
                 <p className="text-muted-foreground text-center md:text-xl mt-2">
-                    Experience secure, transparent voting with <strong className="font-normal">Trusto</strong>.<br/>
-                    Our blockchain-hybrid platform ensures every vote is trusted.
+                    Experience transparent voting with <strong className="font-normal">Trusto</strong>, blockchain
+                    hybrid platform.
                 </p>
             </div>
 
-            <div className="h-full w-full md:w-1/2 flex justify-center items-center">
+            <div className="w-full md:w-1/2 flex justify-center items-center">
                 <div
                     className="relative w-full overflow-hidden rounded-lg border glass shadow-xl"
                 >

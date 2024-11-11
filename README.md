@@ -4,4 +4,4 @@ https://trusto-foo.vercel.app
 
 TODO Alert: remove 0.0.0.0/0 from Mongo and set Vercel IP
 
-TODO Upgrade: button loader, toast message, share poll link
+TODO Upgrade: share poll & finalized poll link

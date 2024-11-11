@@ -1,24 +1,30 @@
 'use client'
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
 import axios from "axios";
 import {getSolBalance, openBlockchainExplorerAddress, requestSolAirdrop} from "@/lib/solanaUtils";
 import {useRouter} from "next/navigation"
 import ShinyButton from "@/components/ui/shiny-button";
 import {Button} from "@/components/ui/button";
+import {useToast} from "@/hooks/use-toast"
 import {
     LucidePlus,
     LucideTrash,
     LucideRefreshCw,
-    LucideHandCoins,
-    LucideExternalLink
+    LucideExternalLink,
+    LucideLoader2
 } from "lucide-react";
 
 
 export default function CreatePoll() {
     const walletAddress = process.env.NEXT_PUBLIC_SOLANA_WALLET_ADDRESS;
     const [walletBalance, setWalletBalance] = useState<number>(0);
+
+    const {toast} = useToast();
+    const [isWalletUpdating, setIsWalletUpdating] = useState<boolean>(false);
+    const [isAirdropLoading, setIsAirdropLoading] = useState<boolean>(false);
+    const [isPollCreating, setIsPollCreating] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -79,6 +85,8 @@ export default function CreatePoll() {
 
 
     const createPoll = async () => {
+        if (isPollCreating) return;
+
         const pollData = {
             email,
             question,
@@ -86,34 +94,77 @@ export default function CreatePoll() {
             voters,
         };
 
-        try {
-            const {data} = await axios.post('/api/create-poll', pollData);
+        for (const key in pollData) {
+            // @ts-ignore
+            if (pollData[key] === '' || (Array.isArray(pollData[key]) && !pollData[key].length)) {
+                toast({
+                    title: "Error",
+                    description: "Some inputs are missing",
+                });
+                return;
+            }
+        }
 
+        try {
+            setIsPollCreating(true);
+            const {data} = await axios.post('/api/create-poll', pollData);
+            toast({
+                title: "Success",
+                description: "Your poll is created",
+            });
             router.push(`/poll/${data.pollId}`);
         } catch (error: any) {
             console.error('ERROR: ', error.response.data.message);
+            toast({
+                title: "Error",
+                description: error.response.data.message,
+            });
+        } finally {
+            setIsPollCreating(false);
         }
     };
 
     const updateBalance = async () => {
-        const balance = await getSolBalance(walletAddress);
-
-        setWalletBalance(balance);
+        try {
+            setIsWalletUpdating(true);
+            const balance = await getSolBalance(walletAddress);
+            setWalletBalance(balance);
+        } catch (error) {
+            console.error('ERROR: ', error);
+        } finally {
+            setIsWalletUpdating(false);
+        }
     };
     const getAirdrop = async () => {
-        await requestSolAirdrop(walletAddress);
-        await updateBalance();
+        try {
+            setIsAirdropLoading(true);
+            await requestSolAirdrop(walletAddress);
+        } catch (error) {
+            console.error('ERROR: ', error);
+            toast({
+                title: "Error",
+                description: `You've either reached your airdrop limit today or the airdrop faucet has run dry.`,
+            });
+        } finally {
+            setIsAirdropLoading(false);
+        }
+
+        const timeout = setTimeout(() => {
+            if (!isWalletUpdating) updateBalance();
+            clearTimeout(timeout);
+        }, 1_000);
     };
 
 
-    // INIT
-    updateBalance(); // async is ignored
+    useEffect(() => {
+        updateBalance(); // async is ignored
+    }, []);
 
 
     return (
         <div className="p-4 text-center md:text-start">
             <div>
-                <div className="flex flex-col md:flex-row justify-center md:justify-between items-center">
+                <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold">Your poll</h2>
                     <p className="text-sm text-muted-foreground">will expire in 7 days</p>
                 </div>
@@ -130,10 +181,15 @@ export default function CreatePoll() {
                     >
                         <LucideExternalLink/>
                     </Button>
-                    <Button onClick={updateBalance} variant="secondary" size="icon"
-                            className="rounded-full"><LucideRefreshCw/></Button>
-                    <Button onClick={getAirdrop} variant="secondary">Airdrop<LucideHandCoins
-                        className="inline h-4 w-4"/></Button>
+                    <Button onClick={updateBalance} disabled={isWalletUpdating || isAirdropLoading} variant="secondary"
+                            size="icon"
+                            className="rounded-full">
+                        {isWalletUpdating ? <LucideLoader2 className="animate-spin"/> : <LucideRefreshCw/>}
+                    </Button>
+                    <Button onClick={getAirdrop} disabled={isAirdropLoading || isWalletUpdating} variant="secondary">
+                        {isAirdropLoading && <LucideLoader2 className="animate-spin"/>}
+                        Airdrop
+                    </Button>
                 </div>
             </div>
 
@@ -220,8 +276,9 @@ export default function CreatePoll() {
             </div>
 
             <ShinyButton onClick={createPoll}
-                         className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all mt-4"
+                         className={`uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all mt-4 ${isPollCreating ? 'opacity-50 cursor-auto' : ''}`}
             >
+                {isPollCreating && <LucideLoader2 className="inline-block h-4 w-4 animate-spin mr-2"/>}
                 Create
             </ShinyButton>
         </div>

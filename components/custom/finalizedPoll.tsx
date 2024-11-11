@@ -1,7 +1,7 @@
 'use client'
 
 import {openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {formatDate} from "@/lib/globals";
 import {LucideCheck, LucideExternalLink, LucideX} from "lucide-react";
 import {Button} from "@/components/ui/button";
@@ -22,6 +22,7 @@ interface FinalizedPollProps {
 
 export default function FinalizedPoll({data}: FinalizedPollProps) {
     const [isPollVerified, setIsPollVerified] = useState<boolean>(false);
+    const [isPollVerifying, setIsPollVerifying] = useState<boolean>(true);
 
     const verifyPoll = async () => {
         const hashData = {
@@ -36,9 +37,13 @@ export default function FinalizedPoll({data}: FinalizedPollProps) {
         const isVerified: boolean = await verifyHashFromSolana(hashData, data.signature);
 
         setIsPollVerified(isVerified);
+        setIsPollVerifying(false);
     };
 
-    verifyPoll() // async is ignored
+    useEffect(() => {
+        verifyPoll() // async is ignored
+    }, []);
+
 
     return (
         <div className="p-4 text-center md:text-start">
@@ -81,7 +86,7 @@ export default function FinalizedPoll({data}: FinalizedPollProps) {
 
             <div className="flex justify-center md:justify-start items-center gap-2 mt-2">
                 <span>Blockchain verified</span>
-                {isPollVerified ? (
+                {!isPollVerifying && (isPollVerified ? (
                     <span
                         className="h-9 aspect-square rounded-full bg-primary-color text-black flex justify-center items-center"
                     ><LucideCheck/>
@@ -91,7 +96,7 @@ export default function FinalizedPoll({data}: FinalizedPollProps) {
                         className="h-9 aspect-square rounded-full bg-secondary-color flex justify-center items-center"
                     ><LucideX/>
                         </span>
-                )}
+                ))}
                 <Button variant="secondary"
                         size="icon"
                         className="rounded-full"

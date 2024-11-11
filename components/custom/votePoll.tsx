@@ -15,11 +15,14 @@ import {Button} from "@/components/ui/button";
 import {openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
 import ShinyButton from "@/components/ui/shiny-button";
 import {formatDate} from "@/lib/globals";
+import {useToast} from "@/hooks/use-toast";
 import {
     LucideExternalLink,
     LucideX,
-    LucideCheck
+    LucideCheck,
+    LucideLoader2
 } from "lucide-react";
+
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -51,6 +54,11 @@ export default function VotePoll({data}: PollProps) {
     const router = useRouter();
     const [isPollVerified, setIsPollVerified] = useState<boolean>(false);
 
+    const {toast} = useToast();
+    const [isPollVoting, setIsPollVoting] = useState<boolean>(false);
+    const [isPollFinalizing, setIsPollFinalizing] = useState<boolean>(false);
+    const [isPollVerifying, setIsPollVerifying] = useState<boolean>(false);
+
     const [email, setEmail] = useState<string>('');
     const [answer, setAnswer] = useState<string>('');
 
@@ -63,6 +71,7 @@ export default function VotePoll({data}: PollProps) {
 
 
     const verifyPoll = async () => {
+        setIsPollVerifying(true);
         let isVerified: boolean = true;
         const hashData = {
             pollId: data._id,
@@ -77,6 +86,7 @@ export default function VotePoll({data}: PollProps) {
         isVerified = await verifyVotes();
 
         setIsPollVerified(isVerified);
+        setIsPollVerifying(false);
     };
     const verifyVotes = async () => {
         let isVerified: boolean = true;
@@ -95,23 +105,59 @@ export default function VotePoll({data}: PollProps) {
     };
 
     const votePoll = async () => {
+        if (isPollVoting || isPollFinalizing) return;
+
         const voteData = {
             pollId: data._id,
             email,
             answer
         };
 
+        if (voteData.email === '' || voteData.answer === '') {
+            toast({
+                title: "Error",
+                description: "Some inputs are missing",
+            });
+            return;
+        }
+
         try {
+            setIsPollVoting(true);
             await axios.post('/api/vote-poll', voteData);
+            toast({
+                title: "Success",
+                description: "Your vote is signed",
+            });
         } catch (error: any) {
             console.error('ERROR: ', error.response.data.message);
+            toast({
+                title: "Error",
+                description: error.response.data.message,
+            });
+        } finally {
+            setIsPollVoting(false);
         }
     };
 
     const finalizePoll = async () => {
-        const response = await axios.get(`${base_url}/api/finalize-poll?pollId=${data._id}`);
-
-        router.push(`/poll/${data._id}?finalizedId=${response.data.finalizedPollId}`);
+        if (isPollFinalizing || isPollVoting) return;
+        try {
+            setIsPollFinalizing(true);
+            const response = await axios.get(`${base_url}/api/finalize-poll?pollId=${data._id}`);
+            toast({
+                title: "Success",
+                description: "Poll is finalized",
+            });
+            router.push(`/poll/${data._id}?finalizedId=${response.data.finalizedPollId}`);
+        } catch (error: any) {
+            console.error('ERROR: ', error.response.data.message);
+            toast({
+                title: "Error",
+                description: error.response.data.message,
+            });
+        } finally {
+            setIsPollFinalizing(false);
+        }
     };
 
 
@@ -143,7 +189,10 @@ export default function VotePoll({data}: PollProps) {
                 </Button>
                 <Button variant="secondary"
                         onClick={verifyPoll}
-                >Verify
+                        disabled={isPollVerifying}
+                >
+                    {isPollVerifying && <LucideLoader2 className="animate-spin"/>}
+                    Verify
                 </Button>
             </div>
 
@@ -177,13 +226,15 @@ export default function VotePoll({data}: PollProps) {
 
             <div className="mt-4">
                 <ShinyButton onClick={votePoll}
-                             className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all mr-4"
+                             className={`uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all mr-4 ${isPollVoting || isPollFinalizing ? 'opacity-50 cursor-auto' : ''}`}
                 >
+                    {isPollVoting && <LucideLoader2 className="inline-block h-4 w-4 animate-spin mr-2"/>}
                     Vote
                 </ShinyButton>
                 <ShinyButton onClick={finalizePoll}
-                             className="uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all"
+                             className={`uppercase bg-secondary-color font-bold hover:bg-primary-color hover:text-black transition-all ${isPollFinalizing || isPollVoting ? 'opacity-50 cursor-auto' : ''}`}
                 >
+                    {isPollFinalizing && <LucideLoader2 className="inline-block h-4 w-4 animate-spin mr-2"/>}
                     Finalize
                 </ShinyButton>
             </div>
