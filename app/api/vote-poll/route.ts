@@ -53,11 +53,11 @@ export async function POST(request) {
         const voteId = result.insertedId.toString();
 
         const hashData = {
-            pollId: vote.pollId,
+            pollId: voteData.pollId,
             voteId: voteId,
-            email: vote.email,
-            answer: vote.answer,
-            timestamp: vote.timestamp
+            email: voteData.email,
+            answer: voteData.answer,
+            timestamp: data.timestamp
         };
 
         const walletPrivateKey = process.env.SOLANA_WALLET_PRIVATE_KEY.split(',').map(Number);

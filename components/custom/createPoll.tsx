@@ -111,9 +111,13 @@ export default function CreatePoll() {
 
 
     return (
-        <div className="h-full p-4 overflow-y-auto text-center md:text-start">
+        <div className="p-4 text-center md:text-start">
             <div>
-                <h2 className="text-xl font-bold">Your poll</h2>
+                <div className="flex flex-col md:flex-row justify-center md:justify-between items-center">
+                    <h2 className="text-xl font-bold">Your poll</h2>
+                    <p className="text-sm text-muted-foreground">will expire in 7 days</p>
+                </div>
+
 
                 <div className="mt-2 flex justify-center md:justify-start items-center gap-2">
                     <span>{walletBalance} SOL</span>

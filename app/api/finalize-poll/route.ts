@@ -18,7 +18,7 @@ const verifyPoll = async (poll) => {
         timestamp: poll.timestamp
     };
 
-    isVerified = await verifyHashFromSolana(hashData, data.signature);
+    isVerified = await verifyHashFromSolana(hashData, poll.signature);
     isVerified = await verifyVotes(poll.votes);
 
     return isVerified;
@@ -70,7 +70,7 @@ export async function GET(request) {
             return new Response(JSON.stringify({message: 'Some vote are missing'}), {status: 500});
         }
 
-        const isVerified = verifyPoll(poll);
+        const isVerified = await verifyPoll(poll);
         const answerPercentages = calculatePercentages(poll.answers, poll.votes.map(el => el.answer));
 
         let expiresAt = new Date();
@@ -105,7 +105,7 @@ export async function GET(request) {
         const signature = await recordHashToSolana(keypair, hash);
 
         const updateData = {$set: {hash: hash, signature: signature}};
-        await finalizedPollsCollection.updateOne({_id: new ObjectId(voteId)}, updateData);
+        await finalizedPollsCollection.updateOne({_id: new ObjectId(finalizedPollId)}, updateData);
 
         await pollsCollection.deleteOne({_id: new ObjectId(pollId)});
         await votesCollection.deleteMany({pollId: pollId});

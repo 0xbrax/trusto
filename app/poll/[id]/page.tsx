@@ -41,7 +41,7 @@ export default async function Poll(context: any) {
 
 
     return (
-        <div id="poll" className="container mx-auto px-4 h-full flex justify-center items-center">
+        <div id="poll" className="container mx-auto px-4 h-full flex justify-center items-center overflow-y-auto">
             <div
                 className="relative w-full md:w-1/2 overflow-hidden rounded-lg border glass shadow-xl"
             >

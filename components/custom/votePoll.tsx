@@ -88,6 +88,7 @@ export default function VotePoll({data}: PollProps) {
                 answer: vote.answer,
                 timestamp: vote.timestamp
             };
+
             isVerified = await verifyHashFromSolana(hashData, vote.signature);
         }
         return isVerified;
@@ -116,12 +117,9 @@ export default function VotePoll({data}: PollProps) {
 
     return (
         <div className="p-4 text-center md:text-start">
-            <div className="flex flex-col justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-center md:justify-between items-center">
                 <h2 className="text-xl font-bold">Vote poll</h2>
-
-                <div>
-                    Expires at {formatDate(data.expiresAt)}
-                </div>
+                <p className="text-sm text-muted-foreground">expires at {formatDate(data.expiresAt)}</p>
             </div>
 
             <div className="flex justify-center md:justify-start items-center gap-2 mt-2">
