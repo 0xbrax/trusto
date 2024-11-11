@@ -2,11 +2,12 @@
 
 'use client'
 
-import { createContext, useContext } from 'react';
+import {createContext, useContext} from 'react';
 
 const GlobalContext = createContext();
 
-export const GlobalProvider = ({ children }) => {
+export const GlobalProvider = ({children}) => {
+    // TODO Upgrade: SOL balance handler here
 
     return (
         <GlobalContext.Provider

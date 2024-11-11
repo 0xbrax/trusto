@@ -1,5 +1,4 @@
 import type {Metadata} from "next";
-import localFont from "next/font/local";
 import "@/app/globals.css";
 
 import {GlobalProvider} from "@/context/GlobalContext";
