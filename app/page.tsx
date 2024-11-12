@@ -1,7 +1,5 @@
 "use client";
 
-//import Image from "next/image";
-
 import {BorderBeam} from "@/components/ui/border-beam";
 import CreatePoll from "@/components/custom/createPoll";
 

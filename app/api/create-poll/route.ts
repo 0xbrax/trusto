@@ -47,15 +47,11 @@ export async function POST(request) {
             timestamp: data.timestamp,
         };
 
-        console.log('111 LOG - - - - - - -', hashData)
-
         const walletPrivateKey = process.env.SOLANA_WALLET_PRIVATE_KEY.split(',').map(Number);
         const keypair = Keypair.fromSecretKey(new Uint8Array(walletPrivateKey));
         const hash = calculateHash(hashData);
 
         const signature = await recordHashToSolana(keypair, hash);
-
-        console.log('222 LOG - - - -- - -', signature)
 
         const updateData = {$set: {hash: hash, signature: signature}};
         await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);
