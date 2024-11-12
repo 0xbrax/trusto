@@ -9,7 +9,7 @@ import {Toaster} from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
     title: "Trusto.foo",
-    description: "Hybrid WEB2-WEB3 voting platform based on Solana blockchain.",
+    description: "Experience transparent voting with Trusto, hybrid Web2-Web3 platform based on Solana blockchain.",
 };
 
 export default function RootLayout({

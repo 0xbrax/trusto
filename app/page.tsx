@@ -18,9 +18,8 @@ export default function Home() {
                     <span className="text-secondary-color">o</span>ne vote at a time <span
                     className="inline-block px-3 bg-primary-color text-secondary-color">!</span>
                 </h1>
-                <p className="text-muted-foreground text-center md:text-xl mt-2">
-                    Experience transparent voting with <strong className="font-normal">Trusto</strong>, blockchain
-                    hybrid platform.
+                <p className="text-muted-foreground text-center md:text-xl md:mt-2">
+                    Web2-Web3 <strong className="font-normal">voting platform</strong>
                 </p>
             </div>
 
