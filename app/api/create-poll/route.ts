@@ -16,8 +16,6 @@ export async function POST(request) {
     try {
         const client = await getMongoConnection();
 
-        console.log('LOG - -- -', client)
-
         const db = client.db("trusto");
         const pollsCollection = db.collection("polls");
         /*await pollsCollection.createIndex(
@@ -49,13 +47,15 @@ export async function POST(request) {
             timestamp: data.timestamp,
         };
 
+        console.log('111 LOG - - - - - - -', hashData)
+
         const walletPrivateKey = process.env.SOLANA_WALLET_PRIVATE_KEY.split(',').map(Number);
         const keypair = Keypair.fromSecretKey(new Uint8Array(walletPrivateKey));
         const hash = calculateHash(hashData);
 
-        const {signature, error} = await recordHashToSolana(keypair, hash);
+        const signature = await recordHashToSolana(keypair, hash);
 
-        console.log('LOG - - - -- - -', signature, error)
+        console.log('222 LOG - - - -- - -', signature)
 
         const updateData = {$set: {hash: hash, signature: signature}};
         await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);
