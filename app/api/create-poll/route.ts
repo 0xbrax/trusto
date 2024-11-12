@@ -37,7 +37,7 @@ export async function POST(request) {
         const result = await pollsCollection.insertOne(data);
         const pollId = result.insertedId.toString();
 
-        const hashData = {
+        /*const hashData = {
             pollId: pollId,
             email: data.email,
             question: data.question,
@@ -53,7 +53,7 @@ export async function POST(request) {
         const signature = await recordHashToSolana(keypair, hash);
 
         const updateData = {$set: {hash: hash, signature: signature}};
-        await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);
+        await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);*/
 
         return new Response(JSON.stringify({pollId: pollId, signature: signature}), {status: 200});
     } catch (error) {
