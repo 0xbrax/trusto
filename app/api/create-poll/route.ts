@@ -56,7 +56,7 @@ export async function POST(request) {
         const updateData = {$set: {hash: hash, signature: signature}};
         await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);*/
 
-        return new Response(JSON.stringify({pollId: pollId, signature: signature}), {status: 200});
+        return new Response(JSON.stringify({pollId: pollId, signature: 'signature'}), {status: 200});
     } catch (error) {
         return new Response(JSON.stringify({message: `Oh, no... ${error}`}), {status: 500});
     }
