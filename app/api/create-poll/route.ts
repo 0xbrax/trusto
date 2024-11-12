@@ -2,12 +2,12 @@
 
 import {getMongoConnection} from "@/lib/mongoUtils";
 
-/*import {ObjectId} from 'mongodb';
+import {ObjectId} from 'mongodb';
 
 import {calculateHash, recordHashToSolana} from "@/lib/solanaUtils";
 import {
     Keypair,
-} from "@solana/web3.js";*/
+} from "@solana/web3.js";
 
 
 export async function POST(request) {
@@ -38,7 +38,7 @@ export async function POST(request) {
         const result = await pollsCollection.insertOne(data);
         const pollId = result.insertedId.toString();
 
-        /*const hashData = {
+        const hashData = {
             pollId: pollId,
             email: data.email,
             question: data.question,
@@ -51,12 +51,14 @@ export async function POST(request) {
         const keypair = Keypair.fromSecretKey(new Uint8Array(walletPrivateKey));
         const hash = calculateHash(hashData);
 
-        const signature = await recordHashToSolana(keypair, hash);
+        const {signature, error} = await recordHashToSolana(keypair, hash);
+
+        console.log('LOG - - - -- - -', signature, error)
 
         const updateData = {$set: {hash: hash, signature: signature}};
-        await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);*/
+        await pollsCollection.updateOne({_id: new ObjectId(pollId)}, updateData);
 
-        return new Response(JSON.stringify({pollId: pollId, signature: 'signature'}), {status: 200});
+        return new Response(JSON.stringify({pollId: pollId, signature: signature}), {status: 200});
     } catch (error) {
         return new Response(JSON.stringify({message: `Oh, no... ${error}`}), {status: 500});
     }
