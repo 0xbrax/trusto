@@ -1,12 +1,13 @@
 // @ts-nocheck
 
 import {getMongoConnection} from "@/lib/mongoUtils";
-import {ObjectId} from 'mongodb';
+
+/*import {ObjectId} from 'mongodb';
 
 import {calculateHash, recordHashToSolana} from "@/lib/solanaUtils";
 import {
     Keypair,
-} from "@solana/web3.js";
+} from "@solana/web3.js";*/
 
 
 export async function POST(request) {
