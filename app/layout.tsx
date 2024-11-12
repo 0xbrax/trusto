@@ -4,8 +4,7 @@ import "@/app/globals.css";
 import {GlobalProvider} from "@/context/GlobalContext";
 import Particles from "@/components/ui/particles";
 import Menubar from "@/components/custom/menubar";
-import {Toaster} from "@/components/ui/toaster"
-
+import {Toaster} from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
     title: "Trusto.foo",
