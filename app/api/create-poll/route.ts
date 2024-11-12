@@ -16,6 +16,8 @@ export async function POST(request) {
     try {
         const client = await getMongoConnection();
 
+        console.log('LOG - -- -', client)
+
         const db = client.db("trusto");
         const pollsCollection = db.collection("polls");
         /*await pollsCollection.createIndex(
