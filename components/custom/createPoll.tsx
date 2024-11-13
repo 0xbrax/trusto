@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
 import axios from "axios";
-import {getSolBalance, openBlockchainExplorerAddress, requestSolAirdrop} from "@/lib/solanaUtils";
+import {openBlockchainExplorerAddress, requestSolAirdrop} from "@/lib/solanaUtils";
 import {useRouter} from "next/navigation";
 import {useGlobal} from "@/context/GlobalContext";
 import ShinyButton from "@/components/ui/shiny-button";
@@ -130,6 +130,10 @@ export default function CreatePoll() {
             await updateBalance();
         } catch (error) {
             console.error('ERROR: ', error);
+            toast({
+                title: "Error",
+                description: `SOLANA Devnet is down...`,
+            });
         } finally {
             setIsWalletUpdating(false);
         }
