@@ -1,5 +1,6 @@
 https://trusto-foo.vercel.app
 
-TODO Warning: remove 0.0.0.0/0 from Mongo and set Vercel IP
+TODO Warning: check 0.0.0.0/0 database access IP in MongoDB
 
-TODO Warning: bigint --> vercel serverless fn & solana web3js
+TODO Upgrade: "bigint" Solana Web3.js is not compatible with Vercel serverless fn, pure JS will be used (less
+performance) 

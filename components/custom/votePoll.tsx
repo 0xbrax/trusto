@@ -16,11 +16,13 @@ import {openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils"
 import ShinyButton from "@/components/ui/shiny-button";
 import {formatDate} from "@/lib/globals";
 import {useToast} from "@/hooks/use-toast";
+import {useClipboard} from "@/hooks/useClipboard";
 import {
     LucideExternalLink,
     LucideX,
     LucideCheck,
-    LucideLoader2
+    LucideLoader2,
+    LucideCopy
 } from "lucide-react";
 
 
@@ -52,6 +54,7 @@ interface PollProps {
 
 export default function VotePoll({data}: PollProps) {
     const router = useRouter();
+    const {copyToClipboard} = useClipboard();
     const [isPollVerified, setIsPollVerified] = useState<boolean>(false);
 
     const {toast} = useToast();
@@ -67,6 +70,12 @@ export default function VotePoll({data}: PollProps) {
     };
     const handleAnswerChange = (value: string) => {
         setAnswer(value);
+    };
+
+    const handleCopy = () => {
+        const url = `${base_url}/poll/${data._id}`;
+
+        copyToClipboard(url); // promise is ignored
     };
 
 
@@ -164,7 +173,15 @@ export default function VotePoll({data}: PollProps) {
     return (
         <div className="p-4 text-center md:text-start">
             <div className="flex flex-col md:flex-row justify-center md:justify-between items-center">
-                <h2 className="text-xl font-bold">Vote poll</h2>
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                    <span>Vote poll</span>
+                    <Button variant="ghost"
+                            size="icon"
+                            className="rounded-full hover:bg-secondary/20 hover:text-white"
+                            onClick={handleCopy}
+                    ><LucideCopy/>
+                    </Button>
+                </h2>
                 <p className="text-sm text-muted-foreground">expires at {formatDate(data.expiresAt)}</p>
             </div>
 

@@ -3,9 +3,19 @@
 import {openBlockchainExplorerTx, verifyHashFromSolana} from "@/lib/solanaUtils";
 import React, {useEffect, useState} from "react";
 import {formatDate} from "@/lib/globals";
-import {LucideCheck, LucideExternalLink, LucideX} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Separator} from "@/components/ui/separator";
+import {useClipboard} from "@/hooks/useClipboard";
+import {
+    LucideCheck,
+    LucideExternalLink,
+    LucideX,
+    LucideCopy
+} from "lucide-react";
+
+
+const base_url = process.env.NEXT_PUBLIC_BASE_URL;
+
 
 interface FinalizedPollProps {
     data: {
@@ -21,8 +31,16 @@ interface FinalizedPollProps {
 }
 
 export default function FinalizedPoll({data}: FinalizedPollProps) {
+    const {copyToClipboard} = useClipboard();
+
     const [isPollVerified, setIsPollVerified] = useState<boolean>(false);
     const [isPollVerifying, setIsPollVerifying] = useState<boolean>(true);
+
+    const handleCopy = () => {
+        const url = `${base_url}/poll/${data.pollId}?finalizedId=${data._id}`;
+
+        copyToClipboard(url); // promise is ignored
+    };
 
     const verifyPoll = async () => {
         const hashData = {
@@ -41,14 +59,22 @@ export default function FinalizedPoll({data}: FinalizedPollProps) {
     };
 
     useEffect(() => {
-        verifyPoll() // async is ignored
+        verifyPoll() // promise is ignored
     }, []);
 
 
     return (
         <div className="p-4 text-center md:text-start">
             <div className="flex flex-col md:flex-row justify-center md:justify-between items-center">
-                <h2 className="text-xl font-bold">Finalized poll</h2>
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                    <span>Finalized poll</span>
+                    <Button variant="ghost"
+                            size="icon"
+                            className="rounded-full hover:bg-secondary/20 hover:text-white"
+                            onClick={handleCopy}
+                    ><LucideCopy/>
+                    </Button>
+                </h2>
                 <p className="text-sm text-muted-foreground">expires at {formatDate(data.expiresAt)}</p>
             </div>
 

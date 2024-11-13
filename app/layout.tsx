@@ -1,5 +1,3 @@
-//TODO Upgrade: clipboard copy link poll & finalized poll
-
 import type {Metadata} from "next";
 import "@/app/globals.css";
 

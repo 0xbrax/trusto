@@ -4,10 +4,11 @@ import React, {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
 import axios from "axios";
 import {getSolBalance, openBlockchainExplorerAddress, requestSolAirdrop} from "@/lib/solanaUtils";
-import {useRouter} from "next/navigation"
+import {useRouter} from "next/navigation";
+import {useGlobal} from "@/context/GlobalContext";
 import ShinyButton from "@/components/ui/shiny-button";
 import {Button} from "@/components/ui/button";
-import {useToast} from "@/hooks/use-toast"
+import {useToast} from "@/hooks/use-toast";
 import {
     LucidePlus,
     LucideTrash,
@@ -18,8 +19,7 @@ import {
 
 
 export default function CreatePoll() {
-    const walletAddress = process.env.NEXT_PUBLIC_SOLANA_WALLET_ADDRESS;
-    const [walletBalance, setWalletBalance] = useState<number>(0);
+    const {walletAddress, walletBalance, updateBalance}: any = useGlobal();
 
     const {toast} = useToast();
     const [isWalletUpdating, setIsWalletUpdating] = useState<boolean>(false);
@@ -124,11 +124,10 @@ export default function CreatePoll() {
         }
     };
 
-    const updateBalance = async () => {
+    const handleUpdateBalance = async () => {
         try {
             setIsWalletUpdating(true);
-            const balance = await getSolBalance(walletAddress);
-            setWalletBalance(balance);
+            await updateBalance();
         } catch (error) {
             console.error('ERROR: ', error);
         } finally {
@@ -139,25 +138,29 @@ export default function CreatePoll() {
         try {
             setIsAirdropLoading(true);
             await requestSolAirdrop(walletAddress);
+            toast({
+                title: "Success",
+                description: `Your DEV SOL are on their way, auto update balance in 10 seconds`,
+            });
         } catch (error) {
             console.error('ERROR: ', error);
             toast({
                 title: "Error",
-                description: `You've either reached your airdrop limit today or the airdrop faucet has run dry.`,
+                description: `You have either reached your airdrop limit today or the airdrop faucet has run dry.`,
             });
         } finally {
             setIsAirdropLoading(false);
         }
 
         const timeout = setTimeout(() => {
-            if (!isWalletUpdating) updateBalance();
+            if (!isWalletUpdating) handleUpdateBalance();
             clearTimeout(timeout);
-        }, 1_000);
+        }, 10_000);
     };
 
 
     useEffect(() => {
-        updateBalance(); // async is ignored
+        handleUpdateBalance(); // promise is ignored
     }, []);
 
 
@@ -171,7 +174,7 @@ export default function CreatePoll() {
 
 
                 <div className="mt-2 flex justify-center md:justify-start items-center gap-2">
-                    <span>{walletBalance} SOL</span>
+                    <span>{walletBalance} DEV SOL</span>
 
                     <Button
                         variant="secondary"
@@ -181,7 +184,8 @@ export default function CreatePoll() {
                     >
                         <LucideExternalLink/>
                     </Button>
-                    <Button onClick={updateBalance} disabled={isWalletUpdating || isAirdropLoading} variant="secondary"
+                    <Button onClick={handleUpdateBalance} disabled={isWalletUpdating || isAirdropLoading}
+                            variant="secondary"
                             size="icon"
                             className="rounded-full">
                         {isWalletUpdating ? <LucideLoader2 className="animate-spin"/> : <LucideRefreshCw/>}
